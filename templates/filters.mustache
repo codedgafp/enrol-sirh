@@ -1,0 +1,78 @@
+{{!
+    This file is part of Moodle - http://moodle.org/
+
+    Moodle is free software: you can redistribute it and/or modify
+    it under the terms of the GNU General Public License as published by
+    the Free Software Foundation, either version 3 of the License, or
+    (at your option) any later version.
+
+    Moodle is distributed in the hope that it will be useful,
+    but WITHOUT ANY WARRANTY; without even the implied warranty of
+    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+    GNU General Public License for more details.
+
+    You should have received a copy of the GNU General Public License
+    along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
+}}
+{{!
+    @template enrol_sirh/filters
+
+    This template display sirh form filters.
+}}
+
+<div id="enrol-sirh-filters">
+    <div id="filter-title">
+        <i class="fa fa-filter" aria-hidden="true"></i>{{# str }} filterlabeltemplate, enrol_sirh {{/ str }}
+    </div>
+    <form id="sirh-filter-form">
+
+        {{# sirhlistmultiple }}
+            <div id="sirh-filter" class="inline-form">
+                <label for="sirh">{{# str }} sirhlabelfiltertemplate, enrol_sirh {{/ str }}</label>
+                <select name="sirh" id="sirh">
+                    {{#sirhlist}}
+                        <option value="{{ code }}"> {{ name }}</option>
+                    {{/sirhlist}}
+                </select>
+            </div>
+        {{/ sirhlistmultiple }}
+        {{^ sirhlistmultiple }}
+            <input id="sirh" type="hidden" name="sirh" value="{{ sirh }}"/>
+        {{/ sirhlistmultiple }}
+
+        <div id="trainingsirh-filter" class="inline-form">
+            <label for="trainingsirh">{{# str }} sirhtrainingidlabelfiltertemplate, enrol_sirh {{/ str }}</label>
+            <input type="text" name="trainingsirh" id="trainingsirh"/>
+        </div>
+
+        <div id="traininglabelsirh-filter" class="inline-form">
+            <label for="traininglabelsirh">{{# str }} sirhtraininglabelfiltertemplate, enrol_sirh {{/ str }}</label>
+            <input type="text" name="traininglabelsirh" id="traininglabelsirh"/>
+        </div>
+
+        <div id="sessionsirh-filter" class="inline-form">
+            <label for="sessionsirh">{{# str }} sirhsessionidlabelfiltertemplate, enrol_sirh {{/ str }}</label>
+            <input type="text" name="sessionsirh" id="sessionsirh"/>
+        </div>
+
+        <div id="sessionlabelsirh-filter" class="inline-form">
+            <label for="sessionlabelsirh">{{# str }} sirhsessionlabelfiltertemplate, enrol_sirh {{/ str }}</label>
+            <input type="text" name="sessionlabelsirh" id="sessionlabelsirh"/>
+        </div>
+
+        <div id="datestart-filter" class="inline-form">
+            <label for="datestart">{{# str }} sirhdatestartlabelfiltertemplate, enrol_sirh {{/ str }}</label>
+            <input type="date" id="datestart" name="datestart" value="{{ defaultstartdate }}" placeholder="{{# str }} start, local_mentor_specialization {{/ str }}">
+        </div>
+
+        <div id="dateend-filter" class="inline-form">
+            <label for="dateend">{{# str }} sirhdateendlabelfiltertemplate, enrol_sirh {{/ str }}</label>
+            <input type="date" id="dateend" name="dateend" value="{{ defaultenddate }}" placeholder="{{# str }} end, local_mentor_specialization {{/ str }}">
+        </div>
+
+        <div id="buttons-filter" class="inline-form">
+            <button id="filter-button" class="btn btn-primary"><i class="fa fa-filter" aria-hidden="true"></i>{{# str }} applyfiltertemplate, enrol_sirh {{/ str }}</button>
+            <button id="reset-filter-button" class="btn btn-link">{{# str }} resetfiltertemplate, enrol_sirh {{/ str }}</button>
+        </div>
+    </form>
+</div>
