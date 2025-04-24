@@ -108,7 +108,10 @@ $string['showmore'] = 'Lire la suite';
 $string['showless'] = 'Voir moins';
 $string['sirh_modal_title'] = 'Notification des nouveaux utilisateurs';
 $string['sirh_modal_content']
-    = 'Attention, une notification mél sera envoyée à tous les utilisateurs inscrits à la session. Les utilisateurs ayant un compte créé ou réactivé recevront également une notification spécifique. Voulez-vous continuer ?';
+    = 'Attention, une notification mél sera envoyée à tous les utilisateurs inscrits à la session. Les utilisateurs ayant un compte créé ou réactivé recevront également une notification spécifique.
+
+Cette opération peut prendre un certain temps selon le volume d\'inscription à traiter, vous recevrez une confirmation par mél dès que l\'opération sera terminée.
+Voulez-vous continuer ?';
 $string['sirh_group_name'] = 'Liaison SIRH - {$a->c1} - {$a->c2} - {$a->c3}';
 
 $string['task_check_update_sirh'] = 'Mettre à jour les liaisons SIRH/Mentor';
