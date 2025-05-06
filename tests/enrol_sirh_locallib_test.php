@@ -27,6 +27,8 @@ defined('MOODLE_INTERNAL') || die();
 
 global $CFG;
 
+use enrol_sirh\helper\testhelper;
+
 require_once($CFG->dirroot . '/enrol/sirh/locallib.php');
 
 class enrol_sirh_locallib_testcase extends advanced_testcase {
@@ -387,6 +389,7 @@ class enrol_sirh_locallib_testcase extends advanced_testcase {
     public function test_enrol_sirh_validate_users_nok_user_suspended() {
         $this->resetAfterTest(true);
         self::setAdminUser();
+        testhelper::create_default_entity($this);
 
         $instance = $this->get_false_instance_data();
         $users = $this->get_default_users_data();
@@ -470,6 +473,7 @@ class enrol_sirh_locallib_testcase extends advanced_testcase {
     public function test_enrol_sirh_validate_users_nok_higher_role() {
         $this->resetAfterTest(true);
         self::setAdminUser();
+        testhelper::create_default_entity($this);
 
         $instance = $this->get_false_instance_data();
         $users = $this->get_default_users_data();
@@ -550,6 +554,7 @@ class enrol_sirh_locallib_testcase extends advanced_testcase {
     public function test_enrol_sirh_validate_users_nok_new_role() {
         $this->resetAfterTest(true);
         self::setAdminUser();
+        testhelper::create_default_entity($this);
 
         $instance = $this->get_false_instance_data();
         $users = $this->get_default_users_data();

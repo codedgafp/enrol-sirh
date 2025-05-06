@@ -27,6 +27,8 @@ defined('MOODLE_INTERNAL') || die();
 
 global $CFG;
 
+use enrol_sirh\helper\testhelper;
+
 require_once($CFG->dirroot . '/enrol/sirh/lib.php');
 
 class enrol_sirh_plugin_testcase extends advanced_testcase {
@@ -166,6 +168,7 @@ class enrol_sirh_plugin_testcase extends advanced_testcase {
         global $DB;
 
         $this->resetAfterTest(true);
+        testhelper::create_default_entity($this);
 
         self::setAdminUser();
 
@@ -293,6 +296,7 @@ class enrol_sirh_plugin_testcase extends advanced_testcase {
         $this->resetAfterTest(true);
 
         self::setAdminUser();
+        testhelper::create_default_entity($this);
 
         $dbi = \enrol_sirh\database_interface::get_instance();
 

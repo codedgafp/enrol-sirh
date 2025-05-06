@@ -27,6 +27,8 @@ defined('MOODLE_INTERNAL') || die();
 
 global $CFG;
 
+use enrol_sirh\helper\testhelper;
+
 require_once($CFG->dirroot . '/enrol/sirh/classes/database_interface.php');
 
 class enrol_sirh_dbinterface_testcase extends advanced_testcase {
@@ -274,6 +276,7 @@ class enrol_sirh_dbinterface_testcase extends advanced_testcase {
         $this->reset_singletons();
 
         self::setAdminUser();
+        testhelper::create_default_entity($this);
 
         $course = $this->getDataGenerator()->create_course();
         $sirh = 'SIRH';
