@@ -311,21 +311,21 @@ class enrol_sirh_testcase extends advanced_testcase {
         self::assertIsArray($sirhsessions);
         self::assertCount(1, $sirhsessions);
 
-        self::assertObjectHasAttribute('sirh', $sirhsessions[0]);
+        self::assertObjectHasProperty('sirh', $sirhsessions[0]);
         self::assertEquals('RENOIRH_AES', $sirhsessions[0]->sirh);
-        self::assertObjectHasAttribute('sirhtraining', $sirhsessions[0]);
+        self::assertObjectHasProperty('sirhtraining', $sirhsessions[0]);
         self::assertEquals('RENOIRH_AES_TRAINING', $sirhsessions[0]->sirhtraining);
-        self::assertObjectHasAttribute('sirhtrainingname', $sirhsessions[0]);
+        self::assertObjectHasProperty('sirhtrainingname', $sirhsessions[0]);
         self::assertEquals('RENOIRH_AES_TRAINING_NAME', $sirhsessions[0]->sirhtrainingname);
-        self::assertObjectHasAttribute('sirhsession', $sirhsessions[0]);
+        self::assertObjectHasProperty('sirhsession', $sirhsessions[0]);
         self::assertEquals('RENOIRH_AES_SESSION', $sirhsessions[0]->sirhsession);
-        self::assertObjectHasAttribute('sirhsessionname', $sirhsessions[0]);
+        self::assertObjectHasProperty('sirhsessionname', $sirhsessions[0]);
         self::assertEquals('RENOIRH_AES_SESSION_NAME', $sirhsessions[0]->sirhsessionname);
-        self::assertObjectHasAttribute('startdate', $sirhsessions[0]);
+        self::assertObjectHasProperty('startdate', $sirhsessions[0]);
         self::assertEquals('RENOIRH_AES_START', $sirhsessions[0]->startdate);
-        self::assertObjectHasAttribute('enddate', $sirhsessions[0]);
+        self::assertObjectHasProperty('enddate', $sirhsessions[0]);
         self::assertEquals('RENOIRH_AES_END', $sirhsessions[0]->enddate);
-        self::assertObjectHasAttribute('instanceexists', $sirhsessions[0]);
+        self::assertObjectHasProperty('instanceexists', $sirhsessions[0]);
         self::assertFalse($sirhsessions[0]->instanceexists);
 
         // Enrol not exist.
@@ -382,21 +382,21 @@ class enrol_sirh_testcase extends advanced_testcase {
         self::assertIsArray($sirhsessions);
         self::assertCount(1, $sirhsessions);
 
-        self::assertObjectHasAttribute('sirh', $sirhsessions[0]);
+        self::assertObjectHasProperty('sirh', $sirhsessions[0]);
         self::assertEquals('RENOIRH_AES', $sirhsessions[0]->sirh);
-        self::assertObjectHasAttribute('sirhtraining', $sirhsessions[0]);
+        self::assertObjectHasProperty('sirhtraining', $sirhsessions[0]);
         self::assertEquals('RENOIRH_AES_TRAINING', $sirhsessions[0]->sirhtraining);
-        self::assertObjectHasAttribute('sirhtrainingname', $sirhsessions[0]);
+        self::assertObjectHasProperty('sirhtrainingname', $sirhsessions[0]);
         self::assertEquals('RENOIRH_AES_TRAINING_NAME', $sirhsessions[0]->sirhtrainingname);
-        self::assertObjectHasAttribute('sirhsession', $sirhsessions[0]);
+        self::assertObjectHasProperty('sirhsession', $sirhsessions[0]);
         self::assertEquals('RENOIRH_AES_SESSION', $sirhsessions[0]->sirhsession);
-        self::assertObjectHasAttribute('sirhsessionname', $sirhsessions[0]);
+        self::assertObjectHasProperty('sirhsessionname', $sirhsessions[0]);
         self::assertEquals('RENOIRH_AES_SESSION_NAME', $sirhsessions[0]->sirhsessionname);
-        self::assertObjectHasAttribute('startdate', $sirhsessions[0]);
+        self::assertObjectHasProperty('startdate', $sirhsessions[0]);
         self::assertEquals('RENOIRH_AES_START', $sirhsessions[0]->startdate);
-        self::assertObjectHasAttribute('enddate', $sirhsessions[0]);
+        self::assertObjectHasProperty('enddate', $sirhsessions[0]);
         self::assertEquals('RENOIRH_AES_END', $sirhsessions[0]->enddate);
-        self::assertObjectHasAttribute('instanceexists', $sirhsessions[0]);
+        self::assertObjectHasProperty('instanceexists', $sirhsessions[0]);
         self::assertTrue($sirhsessions[0]->instanceexists);
 
         // Enrol Exist.
@@ -453,40 +453,40 @@ class enrol_sirh_testcase extends advanced_testcase {
         self::assertIsArray($sirhsessions);
         self::assertCount(2, $sirhsessions);
 
-        self::assertObjectHasAttribute('sirh', $sirhsessions[0]);
+        self::assertObjectHasProperty('sirh', $sirhsessions[0]);
         self::assertEquals('RENOIRH_AES', $sirhsessions[0]->sirh);
-        self::assertObjectHasAttribute('sirhtraining', $sirhsessions[0]);
+        self::assertObjectHasProperty('sirhtraining', $sirhsessions[0]);
         self::assertEquals('RENOIRH_AES_TRAINING', $sirhsessions[0]->sirhtraining);
-        self::assertObjectHasAttribute('sirhtrainingname', $sirhsessions[0]);
+        self::assertObjectHasProperty('sirhtrainingname', $sirhsessions[0]);
         self::assertEquals('RENOIRH_AES_TRAINING_NAME', $sirhsessions[0]->sirhtrainingname);
-        self::assertObjectHasAttribute('sirhsession', $sirhsessions[0]);
+        self::assertObjectHasProperty('sirhsession', $sirhsessions[0]);
         self::assertEquals('RENOIRH_AES_SESSION', $sirhsessions[0]->sirhsession);
-        self::assertObjectHasAttribute('sirhsessionname', $sirhsessions[0]);
+        self::assertObjectHasProperty('sirhsessionname', $sirhsessions[0]);
         self::assertEquals('RENOIRH_AES_SESSION_NAME', $sirhsessions[0]->sirhsessionname);
-        self::assertObjectHasAttribute('startdate', $sirhsessions[0]);
+        self::assertObjectHasProperty('startdate', $sirhsessions[0]);
         self::assertEquals('RENOIRH_AES_START', $sirhsessions[0]->startdate);
-        self::assertObjectHasAttribute('enddate', $sirhsessions[0]);
+        self::assertObjectHasProperty('enddate', $sirhsessions[0]);
         self::assertEquals('RENOIRH_AES_END', $sirhsessions[0]->enddate);
-        self::assertObjectHasAttribute('instanceexists', $sirhsessions[0]);
+        self::assertObjectHasProperty('instanceexists', $sirhsessions[0]);
 
         // Enrol exist.
         self::assertTrue($sirhsessions[0]->instanceexists);
 
-        self::assertObjectHasAttribute('sirh', $sirhsessions[1]);
+        self::assertObjectHasProperty('sirh', $sirhsessions[1]);
         self::assertEquals('RENOIRH_AES_2', $sirhsessions[1]->sirh);
-        self::assertObjectHasAttribute('sirhtraining', $sirhsessions[1]);
+        self::assertObjectHasProperty('sirhtraining', $sirhsessions[1]);
         self::assertEquals('RENOIRH_AES_TRAINING_2', $sirhsessions[1]->sirhtraining);
-        self::assertObjectHasAttribute('sirhtrainingname', $sirhsessions[1]);
+        self::assertObjectHasProperty('sirhtrainingname', $sirhsessions[1]);
         self::assertEquals('RENOIRH_AES_TRAINING_NAME_2', $sirhsessions[1]->sirhtrainingname);
-        self::assertObjectHasAttribute('sirhsession', $sirhsessions[1]);
+        self::assertObjectHasProperty('sirhsession', $sirhsessions[1]);
         self::assertEquals('RENOIRH_AES_SESSION_2', $sirhsessions[1]->sirhsession);
-        self::assertObjectHasAttribute('sirhsessionname', $sirhsessions[1]);
+        self::assertObjectHasProperty('sirhsessionname', $sirhsessions[1]);
         self::assertEquals('RENOIRH_AES_SESSION_NAME_2', $sirhsessions[1]->sirhsessionname);
-        self::assertObjectHasAttribute('startdate', $sirhsessions[1]);
+        self::assertObjectHasProperty('startdate', $sirhsessions[1]);
         self::assertEquals('RENOIRH_AES_START_2', $sirhsessions[1]->startdate);
-        self::assertObjectHasAttribute('enddate', $sirhsessions[1]);
+        self::assertObjectHasProperty('enddate', $sirhsessions[1]);
         self::assertEquals('RENOIRH_AES_END_2', $sirhsessions[1]->enddate);
-        self::assertObjectHasAttribute('instanceexists', $sirhsessions[1]);
+        self::assertObjectHasProperty('instanceexists', $sirhsessions[1]);
 
         // Enrol not exist.
         self::assertFalse($sirhsessions[1]->instanceexists);
