@@ -29,6 +29,8 @@ global $CFG;
 
 require_once($CFG->dirroot . '/enrol/sirh/externallib.php');
 
+use core_external\external_warnings;
+
 class enrol_sirh_external_testcase extends advanced_testcase {
 
     public function get_instance_data($courseid) {
@@ -287,7 +289,7 @@ class enrol_sirh_external_testcase extends advanced_testcase {
 
         self::arrayHasKey("warnings", $infoparamaters->keys);
         self::assertIsObject($infoparamaters->keys['warnings']);
-        self::assertInstanceOf('external_warnings', $infoparamaters->keys['warnings']);
+        self::assertInstanceOf(external_warnings::class, $infoparamaters->keys['warnings']);
 
         self::resetAllData();
     }

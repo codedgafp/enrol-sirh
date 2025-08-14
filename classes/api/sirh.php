@@ -18,7 +18,6 @@ namespace enrol_sirh;
 
 defined('MOODLE_INTERNAL') || die();
 
-use core_group\output\user_groups_editable;
 use local_mentor_core\profile_api;
 
 require_once($CFG->dirroot . '/enrol/sirh/externallib.php');
