@@ -32,12 +32,17 @@ use enrol_sirh\helper\testhelper;
 require_once($CFG->dirroot . '/enrol/sirh/lib.php');
 
 class enrol_sirh_plugin_testcase extends advanced_testcase {
+    /** @var enrol_sirh_plugin $sirhplugin */
+    protected $sirhplugin;
+
+    public function setUp(): void
+    {
+        // Create new self enrol instance.
+        $this->sirhplugin = enrol_get_plugin('sirh');
+    }
 
     public function get_instance_data($courseid) {
-        // Create new self enrol instance.
-        $sirhplugin = enrol_get_plugin('sirh');
-
-        $instance = (object) $sirhplugin->get_instance_defaults();
+        $instance = (object) $this->sirhplugin->get_instance_defaults();
         $instance->status = 0;
         $instance->id = '';
         $instance->courseid = $courseid;
@@ -50,7 +55,7 @@ class enrol_sirh_plugin_testcase extends advanced_testcase {
         $instance->customchar2 = 'sirhtraining';
         $instance->customchar3 = 'sirhsession';
         $instance->customint1 = null;
-        $instance->roleid = $sirhplugin->get_config('roleid');
+        $instance->roleid = $this->sirhplugin->get_config('roleid');
 
         return $instance;
     }
@@ -67,16 +72,13 @@ class enrol_sirh_plugin_testcase extends advanced_testcase {
 
         $course = self::getDataGenerator()->create_course();
 
-        // Create new self enrol instance.
-        $sirhplugin = enrol_get_plugin('sirh');
-
         $instance = $this->get_instance_data($course->id);
 
-        self::assertTrue($sirhplugin->can_delete_instance($instance));
+        self::assertTrue($this->sirhplugin->can_delete_instance($instance));
 
         self::setGuestUser();
 
-        self::assertFalse($sirhplugin->can_delete_instance($instance));
+        self::assertFalse($this->sirhplugin->can_delete_instance($instance));
 
         self::resetAllData();
     }
@@ -93,13 +95,10 @@ class enrol_sirh_plugin_testcase extends advanced_testcase {
 
         $course = self::getDataGenerator()->create_course();
 
-        // Create new self enrol instance.
-        $sirhplugin = enrol_get_plugin('sirh');
-
         $instance = $this->get_instance_data($course->id);
 
         self::assertEquals(
-            $sirhplugin->get_instance_name($instance),
+            $this->sirhplugin->get_instance_name($instance),
             'Inscription SIRH (sirh - sirhtraining - sirhsession)'
         );
 
@@ -118,10 +117,7 @@ class enrol_sirh_plugin_testcase extends advanced_testcase {
 
         $course = self::getDataGenerator()->create_course();
 
-        // Create new self enrol instance.
-        $sirhplugin = enrol_get_plugin('sirh');
-
-        self::assertFalse($sirhplugin->can_add_instance($course->id));
+        self::assertFalse($this->sirhplugin->can_add_instance($course->id));
 
         self::resetAllData();
     }
@@ -143,10 +139,8 @@ class enrol_sirh_plugin_testcase extends advanced_testcase {
         // No sirh enrol instance.
         self::assertFalse($DB->record_exists('enrol', ['courseid' => $course->id, 'enrol' => 'sirh']));
 
-        // Create new self enrol instance.
-        $sirhplugin = enrol_get_plugin('sirh');
         $instance = $this->get_instance_data($course->id);
-        $instanceid = $sirhplugin->add_instance($course, (array) $instance);
+        $instanceid = $this->sirhplugin->add_instance($course, (array) $instance);
 
         // Sirh enrol instance create.
         $sirhinstances = $DB->get_records('enrol', ['courseid' => $course->id, 'enrol' => 'sirh']);
@@ -175,9 +169,9 @@ class enrol_sirh_plugin_testcase extends advanced_testcase {
         $course = self::getDataGenerator()->create_course();
 
         // Create new self enrol instance.
-        $sirhplugin = enrol_get_plugin('sirh');
+        /** @var enrol_sirh_plugin */
         $instance = $this->get_instance_data($course->id);
-        $instanceid = $sirhplugin->add_instance($course, (array) $instance);
+        $instanceid = $this->sirhplugin->add_instance($course, (array) $instance);
         $instance = (object) enrol_sirh_external::get_instance_info($instanceid);
 
         self::assertFalse($DB->record_exists('user_enrolments', ['enrolid' => $instanceid]));
@@ -186,7 +180,7 @@ class enrol_sirh_plugin_testcase extends advanced_testcase {
 
         $data = new \stdClass();
         $data->userid = $user1->id;
-        $sirhplugin->enrol_sirh($instance, $data);
+        $this->sirhplugin->enrol_sirh($instance, $data);
 
         $usersenrol = $DB->get_records('user_enrolments', ['enrolid' => $instanceid]);
 
@@ -209,20 +203,18 @@ class enrol_sirh_plugin_testcase extends advanced_testcase {
 
         $course = self::getDataGenerator()->create_course();
 
-        // Create new self enrol instance.
-        $sirhplugin = enrol_get_plugin('sirh');
         $instance = $this->get_instance_data($course->id);
-        $instanceid = $sirhplugin->add_instance($course, (array) $instance);
+        $instanceid = $this->sirhplugin->add_instance($course, (array) $instance);
 
         $instance = (object) enrol_sirh_external::get_instance_info($instanceid);
         self::assertEquals(ENROL_INSTANCE_ENABLED, $instance->status);
 
-        $sirhplugin->update_status($instance, ENROL_INSTANCE_DISABLED);
+        $this->sirhplugin->update_status($instance, ENROL_INSTANCE_DISABLED);
 
         $instance = (object) enrol_sirh_external::get_instance_info($instanceid);
         self::assertEquals(ENROL_INSTANCE_DISABLED, $instance->status);
 
-        $sirhplugin->update_status($instance, ENROL_INSTANCE_ENABLED);
+        $this->sirhplugin->update_status($instance, ENROL_INSTANCE_ENABLED);
 
         $instance = (object) enrol_sirh_external::get_instance_info($instanceid);
         self::assertEquals(ENROL_INSTANCE_ENABLED, $instance->status);
@@ -240,10 +232,7 @@ class enrol_sirh_plugin_testcase extends advanced_testcase {
 
         self::setAdminUser();
 
-        // Create new self enrol instance.
-        $sirhplugin = enrol_get_plugin('sirh');
-
-        self::assertFalse($sirhplugin->allow_unenrol_user(new \stdClass(), new \stdClass()));
+        self::assertFalse($this->sirhplugin->allow_unenrol_user(new \stdClass(), new \stdClass()));
 
         self::resetAllData();
     }
@@ -260,10 +249,8 @@ class enrol_sirh_plugin_testcase extends advanced_testcase {
 
         $course = self::getDataGenerator()->create_course();
 
-        // Create new self enrol instance.
-        $sirhplugin = enrol_get_plugin('sirh');
         $instance = $this->get_instance_data($course->id);
-        $instanceid = $sirhplugin->add_instance($course, (array) $instance);
+        $instanceid = $this->sirhplugin->add_instance($course, (array) $instance);
         $instance = (object) enrol_sirh_external::get_instance_info($instanceid);
 
         self::assertEquals($instance->customchar1, 'sirh');
@@ -274,8 +261,8 @@ class enrol_sirh_plugin_testcase extends advanced_testcase {
         $data->customchar1 = 'newsirh';
         $data->customchar2 = 'newsirhtraining';
         $data->customchar3 = 'newsirhtraining';
-        $data->roleid = $sirhplugin->get_config('roleid');
-        $sirhplugin->update_instance($instance, $data);
+        $data->roleid = $this->sirhplugin->get_config('roleid');
+        $this->sirhplugin->update_instance($instance, $data);
 
         $newinstance = (object) enrol_sirh_external::get_instance_info($instanceid);
 
@@ -312,12 +299,10 @@ class enrol_sirh_plugin_testcase extends advanced_testcase {
         self::assertEmpty(groups_get_members($group1->id));
         self::assertEmpty(groups_get_members($group2->id));
 
-        // Create new self enrol instance.
-        $sirhplugin = enrol_get_plugin('sirh');
         $instance = $this->get_instance_data($course->id);
-        $instanceid = $sirhplugin->add_instance($course, (array) $instance);
+        $instanceid = $this->sirhplugin->add_instance($course, (array) $instance);
         $instance = (object) enrol_sirh_external::get_instance_info($instanceid);
-        $sirhplugin->enrol_user($instance, $user->id);
+        $this->sirhplugin->enrol_user($instance, $user->id);
 
         self::assertNull($instance->customint1);
 
@@ -325,7 +310,7 @@ class enrol_sirh_plugin_testcase extends advanced_testcase {
         $data = new \stdClass();
         $data->customint1 = $group1->id;
 
-        $sirhplugin->update_instance($instance, $data);
+        $this->sirhplugin->update_instance($instance, $data);
 
         $instance = (object) enrol_sirh_external::get_instance_info($instanceid);
         self::assertEquals($instance->customint1, $group1->id);
@@ -341,7 +326,7 @@ class enrol_sirh_plugin_testcase extends advanced_testcase {
         $data = new \stdClass();
         $data->customint1 = $group2->id;
 
-        $sirhplugin->update_instance($instance, $data);
+        $this->sirhplugin->update_instance($instance, $data);
 
         $instance = (object) enrol_sirh_external::get_instance_info($instanceid);
         self::assertEquals($instance->customint1, $group2->id);
@@ -369,17 +354,15 @@ class enrol_sirh_plugin_testcase extends advanced_testcase {
 
         $course = self::getDataGenerator()->create_course();
 
-        // Create new self enrol instance.
-        $sirhplugin = enrol_get_plugin('sirh');
         $instance = $this->get_instance_data($course->id);
-        $instanceid = $sirhplugin->add_instance($course, (array) $instance);
+        $instanceid = $this->sirhplugin->add_instance($course, (array) $instance);
         $instance = (object) enrol_sirh_external::get_instance_info($instanceid);
 
-        self::assertTrue($sirhplugin->can_hide_show_instance($instance));
+        self::assertTrue($this->sirhplugin->can_hide_show_instance($instance));
 
         self::setGuestUser();
 
-        self::assertFalse($sirhplugin->can_hide_show_instance($instance));
+        self::assertFalse($this->sirhplugin->can_hide_show_instance($instance));
 
         self::resetAllData();
     }
@@ -394,10 +377,7 @@ class enrol_sirh_plugin_testcase extends advanced_testcase {
 
         self::setAdminUser();
 
-        // Create new self enrol instance.
-        $sirhplugin = enrol_get_plugin('sirh');
-
-        self::assertTrue($sirhplugin->use_standard_editing_ui());
+        self::assertTrue($this->sirhplugin->use_standard_editing_ui());
 
         self::resetAllData();
     }
@@ -412,8 +392,15 @@ class enrol_sirh_plugin_testcase extends advanced_testcase {
 
         self::setAdminUser();
 
-        // Create new self enrol instance.
-        $sirhplugin = enrol_get_plugin('sirh');
+        // A course with meta enrolment.
+        $course = $this->getDataGenerator()->create_course();
+        $coursecontext = context_course::instance($course->id);
+
+        // Create a sirh enrolment instance.
+        $instance = (object)$this->sirhplugin->get_instance_defaults();
+        $instance->id       = null;
+        $instance->courseid = $course->id;
+        $instance->status   = ENROL_INSTANCE_ENABLED;
 
         $falseenroldata = [
             'customchar1' => 'sirh1',
@@ -425,7 +412,8 @@ class enrol_sirh_plugin_testcase extends advanced_testcase {
             'roleid' => 2,
         ];
 
-        self::assertEmpty($sirhplugin->edit_instance_validation($falseenroldata));
+        $errors = $this->sirhplugin->edit_instance_validation($falseenroldata, [], $instance, $coursecontext);
+        self::assertEmpty($errors);
 
         self::resetAllData();
     }
@@ -441,8 +429,15 @@ class enrol_sirh_plugin_testcase extends advanced_testcase {
 
         self::setAdminUser();
 
-        // Create new self enrol instance.
-        $sirhplugin = enrol_get_plugin('sirh');
+        // A course with meta enrolment.
+        $course = $this->getDataGenerator()->create_course();
+        $coursecontext = context_course::instance($course->id);
+
+        // Create a sirh enrolment instance.
+        $instance = (object)$this->sirhplugin->get_instance_defaults();
+        $instance->id       = null;
+        $instance->courseid = $course->id;
+        $instance->status   = ENROL_INSTANCE_ENABLED;
 
         $falseenroldata = [
             'customchar1' => 'sirh1',
@@ -450,15 +445,8 @@ class enrol_sirh_plugin_testcase extends advanced_testcase {
             'customchar3' => 'sirh3',
         ];
 
-        try {
-            $sirhplugin->edit_instance_validation($falseenroldata);
-            self::fail();
-        } catch (\Exception $e) {
-            self::assertInstanceOf('Exception', $e);
-            // ! L'erreur n'est plus généré, s'il manque un paramètre dans les data envoyé,
-            // ! alors il passe au paramètre suivant
-            // self::assertEquals($e->getMessage(), 'Undefined array key "customint1"');
-        }
+        $errors = $this->sirhplugin->edit_instance_validation($falseenroldata, [], $instance, $coursecontext);
+        $this->assertEquals(get_string('invaliddata', 'error'), $errors['customint1']);
 
         self::resetAllData();
     }

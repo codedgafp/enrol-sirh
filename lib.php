@@ -329,11 +329,10 @@ class enrol_sirh_plugin extends enrol_plugin {
      *
      * @param array $data array of ("fieldname" => value) of submitted data
      * @param array $files array of uploaded files "element_name" => tmp_file_path
-     * @param object $instance The instance loaded from the DB
+     * @param object $instance The instance data loaded from the DB.
      * @param context $context The context of the instance we are editing
      * @return array of "element_name" => "error_description" if there are errors,
      *         or an empty array if everything is OK.
-     * @return void
      */
     public function edit_instance_validation($data, $files = null, $instance = null, $context = null) {
         $errors = [];
@@ -353,6 +352,11 @@ class enrol_sirh_plugin extends enrol_plugin {
             'customint3' => PARAM_INT,
             'roleid' => PARAM_INT,
         ];
+
+        $datadiff = array_diff_key($tovalidate, $data);
+        if (empty($datadiff) === false) {
+            $errors['customint1'] = get_string('invaliddata', 'error');
+        }
 
         $typeerrors = $this->validate_param_types($data, $tovalidate);
         $errors = array_merge($errors, $typeerrors);
