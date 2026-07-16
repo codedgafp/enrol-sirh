@@ -22,7 +22,7 @@ class RestClient implements Iterator, ArrayAccess {
 
     // Populated as-needed.
     public $decoded_response; // Decoded response body.
-
+    public string $url = ''; // Request URL, set during execute().
     public function __construct(array $options = []) {
         $default_options = [
             'headers' => [],

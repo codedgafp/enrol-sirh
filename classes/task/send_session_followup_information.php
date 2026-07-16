@@ -64,16 +64,24 @@ class send_session_followup_information extends \core\task\scheduled_task {
      */
     protected $scheduledfailed;
 
+    /**
+     * Update all flag.
+     *
+     * @var bool
+     */
+    protected $updateall;
+
     public function __construct($statusfilter
     = [
         \local_mentor_core\session::STATUS_IN_PROGRESS,
         \local_mentor_core\session::STATUS_COMPLETED,
-    ], $scheduledfailed = true) {
+    ], $scheduledfailed = true, $updateall = false) {
         $this->dbi = \enrol_sirh\database_interface::get_instance();
         $this->sirhrest = \enrol_sirh\sirh_api::get_sirh_rest_api();
         $this->errors = [];
         $this->statusfilter = $statusfilter;
         $this->scheduledfailed = $scheduledfailed;
+        $this->updateall = $updateall;
     }
 
     /**
@@ -89,11 +97,9 @@ class send_session_followup_information extends \core\task\scheduled_task {
 
     public function execute() {
         // Get all completion link to session after its last sync information to sirh API.
-        $completions = $this->dbi->get_sessions_completed_by_user($this->statusfilter);
-
+        $completions = $this->dbi->get_sessions_completed_by_user($this->statusfilter, $this->updateall);
         // Get session completion information.
         $sessionscompletion = $this->get_sessions_completion_information($completions);
-
         // Create data for API.
         $sessiondata = $this->create_data_for_api($sessionscompletion);
 
@@ -123,9 +129,12 @@ class send_session_followup_information extends \core\task\scheduled_task {
             if (!isset($sessionscompletedinformation[$completion->course])) {
                 $sessionscompletedinformation[$completion->course] = [];
             }
-
-            // Add user completed completion and time when is course is completed.
-            $sessionscompletedinformation[$completion->course][$completion->userid] = $completion->timecompleted;
+             // Add time completed and time enrolled to session.
+            $sessionscompletedinformation[$completion->course][$completion->userid] = (object) [
+                'timecompleted' => $completion->timecompleted,
+                'timeenrolled'  => $completion->timeenrolled ?? $completion->timecompleted,
+            ] ;
+            
         }
 
         return $sessionscompletedinformation;
@@ -182,11 +191,12 @@ class send_session_followup_information extends \core\task\scheduled_task {
             $enrolsirhid = array_search($courseid, $instancesirhbycoursid);
 
             // Create user session data.
-            foreach ($sessioncompletion as $userid => $timecompleted) {
+            foreach ($sessioncompletion as $userid => $completioninfo) {
                 // Init user data.
                 $userinfo = new \stdClass();
                 $userinfo->{'Suivi session utilisateur'} = new \stdClass();
-                $userinfo->{'Suivi session utilisateur'}->dateAchevement = date('Y-m-d', $timecompleted);
+                $userinfo->{'Suivi session utilisateur'}->dateAchevement = date('Y-m-d', $completioninfo->timecompleted);                
+                $userinfo->{'Suivi session utilisateur'}->dateInscription = date('Y-m-d', $completioninfo->timeenrolled);
                 $userinfo->{'Suivi session utilisateur'}->identifiantSirhOrigine = null;
                 $userinfo->{'Suivi session utilisateur'}->identifiantFormation = null;
                 $userinfo->{'Suivi session utilisateur'}->identifiantSession = null;

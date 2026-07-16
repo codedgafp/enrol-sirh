@@ -596,30 +596,23 @@ class enrol_sirh_task_testcase extends advanced_testcase {
         $taskmock->execute();
 
         // Check if send mail.
-        $this->assertSame(3, $sink->count());
+        $this->assertSame(2, $sink->count());
         $resultmail = $sink->get_messages();
-        $this->assertCount(3, $resultmail);
+        $this->assertCount(2, $resultmail);
         $sink->close();
 
         // Check content mail.
         // First mail.
-        $this->assertSame(format_string(get_site()->fullname) . ': ' . get_string('newusernewpasswordsubj'),
-            $resultmail[0]->subject);
+        $this->assertSame('[Mentor] Votre inscription à la formation fullname', $resultmail[0]->subject);
         $this->assertSame($user->email, $resultmail[0]->to);
         $this->assertSame('noreply@' . get_host_from_url($CFG->wwwroot), $resultmail[0]->from);
         $this->assertStringNotContainsString('Content-Type: text/plain', $resultmail[0]->header);
 
         // Second mail.
-        $this->assertSame('[Mentor] Votre inscription à la formation fullname', $resultmail[1]->subject);
-        $this->assertSame($user->email, $resultmail[1]->to);
+        $this->assertSame('Mentor : Modification des inscriptions à une session Mentor par un SIRH', $resultmail[1]->subject);
+        $this->assertSame($USER->email, $resultmail[1]->to);
         $this->assertSame('noreply@' . get_host_from_url($CFG->wwwroot), $resultmail[1]->from);
         $this->assertStringNotContainsString('Content-Type: text/plain', $resultmail[1]->header);
-
-        // Third mail.
-        $this->assertSame('Mentor : Modification des inscriptions à une session Mentor par un SIRH', $resultmail[2]->subject);
-        $this->assertSame($USER->email, $resultmail[2]->to);
-        $this->assertSame('noreply@' . get_host_from_url($CFG->wwwroot), $resultmail[2]->from);
-        $this->assertStringNotContainsString('Content-Type: text/plain', $resultmail[2]->header);
 
         // Check updated instance.
         $instance2 = (object) \enrol_sirh_external::get_instance_info($instanceid);
@@ -746,36 +739,29 @@ class enrol_sirh_task_testcase extends advanced_testcase {
         $taskapi->execute();
 
         // Check if send mail.
-        $this->assertSame(4, $sink->count());
+        $this->assertSame(3, $sink->count());
         $resultmail = $sink->get_messages();
-        $this->assertCount(4, $resultmail);
+        $this->assertCount(3, $resultmail);
         $sink->close();
 
         // Check content mail.
         // First mail.
-        $this->assertSame(format_string(get_site()->fullname) . ': ' . get_string('newusernewpasswordsubj'),
-            $resultmail[0]->subject);
+            $this->assertSame('[Mentor] Votre inscription à la formation fullname', $resultmail[0]->subject);
         $this->assertSame($user->email, $resultmail[0]->to);
         $this->assertSame('noreply@' . get_host_from_url($CFG->wwwroot), $resultmail[0]->from);
         $this->assertStringNotContainsString('Content-Type: text/plain', $resultmail[0]->header);
 
         // Second mail.
-        $this->assertSame('[Mentor] Votre inscription à la formation fullname', $resultmail[1]->subject);
-        $this->assertSame($user->email, $resultmail[1]->to);
+        $this->assertSame('Mentor : Modification des informations d\'une session SIRH', $resultmail[1]->subject);
+        $this->assertSame($USER->email, $resultmail[1]->to);
         $this->assertSame('noreply@' . get_host_from_url($CFG->wwwroot), $resultmail[1]->from);
         $this->assertStringNotContainsString('Content-Type: text/plain', $resultmail[1]->header);
 
-        // Third mail.
-        $this->assertSame('Mentor : Modification des informations d\'une session SIRH', $resultmail[2]->subject);
+        // Last mail.
+        $this->assertSame('Mentor : Modification des inscriptions à une session Mentor par un SIRH', $resultmail[2]->subject);
         $this->assertSame($USER->email, $resultmail[2]->to);
         $this->assertSame('noreply@' . get_host_from_url($CFG->wwwroot), $resultmail[2]->from);
         $this->assertStringNotContainsString('Content-Type: text/plain', $resultmail[2]->header);
-
-        // Last mail.
-        $this->assertSame('Mentor : Modification des inscriptions à une session Mentor par un SIRH', $resultmail[3]->subject);
-        $this->assertSame($USER->email, $resultmail[3]->to);
-        $this->assertSame('noreply@' . get_host_from_url($CFG->wwwroot), $resultmail[3]->from);
-        $this->assertStringNotContainsString('Content-Type: text/plain', $resultmail[3]->header);
 
         // Check updated instance.
         $instance2 = (object) \enrol_sirh_external::get_instance_info($instanceid);

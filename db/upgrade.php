@@ -57,5 +57,11 @@ function xmldb_enrol_sirh_upgrade($oldversion) {
         $task->execute();
     }
 
+    if ($oldversion < 2026123100) {
+        // Send sessions followup informations : Data recovery purpose.
+        $task = new \enrol_sirh\task\send_session_followup_information([], false, true);
+        $task->execute();
+    }
+
     return true;
 }

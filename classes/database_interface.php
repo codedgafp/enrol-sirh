@@ -226,23 +226,30 @@ class database_interface {
      * @return array
      * @throws \dml_exception
      */
-    public function get_sessions_completed_by_user($statusfilter = []) {
+    public function get_sessions_completed_by_user($statusfilter = [], $updateall = false) {
         // Status condition.
-        if (empty($statusfilter)) {
+        if (empty($statusfilter) && !$updateall) {
             $statusfilter = [
                 \local_mentor_core\session::STATUS_IN_PROGRESS,
                 \local_mentor_core\session::STATUS_COMPLETED,
             ];
         }
 
-        $wherestatus = '(';
+        $wheretimesynchronization = '';
+        $wheretimecompletion = '';
+        $wherestatus = '';        
 
-        foreach ($statusfilter as $status) {
-            $wherestatus .= 's.status = \'' . $status . '\' OR ';
+        if(!$updateall) {
+            foreach ($statusfilter as $status) {
+                $wherestatus = '(';
+                $wherestatus .= 's.status = \'' . $status . '\' OR ';
+            }
+            $wherestatus = substr($wherestatus, 0, -4);
+            $wherestatus .= ') AND ';
+            $wheretimesynchronization = ' s.lastsyncsirh < cc.timecompleted OR s.lastsyncsirh IS NULL AND ';
+            $wheretimecompletion = ' cc.timecompleted IS NOT NULL AND ';
         }
-
-        $wherestatus = substr($wherestatus, 0, -4);
-        $wherestatus .= ')';
+        
 
         return $this->db->get_records_sql('
             SELECT cc.*
@@ -250,9 +257,9 @@ class database_interface {
             JOIN {course} c ON cc.course = c.id
             JOIN {session} s ON c.shortname = s.courseshortname
             JOIN {user} u ON u.id = cc.userid
-            WHERE ' . $wherestatus . ' AND
-                (s.lastsyncsirh < cc.timecompleted OR s.lastsyncsirh IS NULL) AND
-                cc.timecompleted IS NOT NULL AND
+            WHERE ' . $wherestatus . ' ' 
+                . $wheretimesynchronization . '
+                ' . $wheretimecompletion . '
                 u.deleted = 0
         ');
     }
