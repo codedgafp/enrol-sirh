@@ -24,7 +24,7 @@
  */
 defined('MOODLE_INTERNAL') || die();
 
-$plugin->version = 2026070900;   // The current plugin version (Date: YYYYMMDDXX).
+$plugin->version = 2026071500;   // The current plugin version (Date: YYYYMMDDXX).
 $plugin->requires = 2020060900;   // Requires this Moodle version.
 $plugin->component = 'enrol_sirh'; // Full name of the plugin (used for diagnostics).
 $plugin->dependencies = [

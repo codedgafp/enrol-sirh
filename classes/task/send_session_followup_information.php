@@ -177,6 +177,10 @@ class send_session_followup_information extends \core\task\scheduled_task {
             $sessionmentor->nomAbregeFormation = $training->shortname;
             $sessionmentor->nomAbregeSession = $session->courseshortname;
             $sessionmentor->libelleFormation = $training->name;
+            $sessionmentor->identifiantFormationMentor = $training->id;
+            $sessionmentor->collectionFormation = $training->collection;
+            $sessionmentor->dureeDistanceSession  = $session->onlinesessionestimatedtime;
+            $sessionmentor->dureePresenceSession  = $session->presencesessionestimatedtime;        
             $sessionmentor->libelleSession = $session->fullname;
             $sessionmentor->identifiantSirhOrigineFormation = $training->idsirh;
             $sessionmentor->dateDebut = date('Y-m-d', $session->sessionstartdate);
