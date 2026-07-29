@@ -96,20 +96,50 @@ class send_session_followup_information extends \core\task\scheduled_task {
     }
 
     public function execute() {
-        // Get all completion link to session after its last sync information to sirh API.
-        $completions = $this->dbi->get_sessions_completed_by_user($this->statusfilter, $this->updateall);
+        $hasnoerror = true;
+
+        // Get session course ids after their last sync information to SIRH API.
+        $courseids = $this->dbi->get_sessions_completed_course_ids_by_user($this->statusfilter, $this->updateall);
+
+        foreach ($courseids as $courseid) {
+            // Get completion links only for the current session course.
+            $completions = $this->dbi->get_sessions_completed_by_user_by_course(
+                $courseid,
+                $this->statusfilter,
+                $this->updateall
+            );
+
+            if (empty($completions)) {
+                continue;
+            }
+
+            $hasnoerror = $this->process_completions_batch($completions) && $hasnoerror;
+        }
+
+        if ($this->scheduledfailed && !$hasnoerror) {
+            // Set task to fail.
+            \core\task\manager::scheduled_task_failed($this);
+        }
+    }
+
+    /**
+     * Process a limited completion batch and send it to SIRH API.
+     *
+     * @param array $completions
+     * @return bool
+     * @throws \coding_exception
+     * @throws \dml_exception
+     * @throws \moodle_exception
+     * @throws \Exception
+     */
+    protected function process_completions_batch($completions) {
         // Get session completion information.
         $sessionscompletion = $this->get_sessions_completion_information($completions);
         // Create data for API.
         $sessiondata = $this->create_data_for_api($sessionscompletion);
 
         // Send to API.
-        $hasnoerror = $this->send_to_api($sessiondata);
-
-        if ($this->scheduledfailed && !$hasnoerror) {
-            // Set task to fail.
-            \core\task\manager::scheduled_task_failed($this);
-        }
+        return $this->send_to_api($sessiondata);
     }
 
     /**
@@ -150,15 +180,20 @@ class send_session_followup_information extends \core\task\scheduled_task {
      * @throws \moodle_exception
      */
     public function create_data_for_api($sessionscompletion) {
+        if (empty($sessionscompletion)) {
+            return [];
+        }
+
         // Init cache.
         $users = [];
         $sirhbyentity = [];
+        $usersidenroledbyinstance = [];
 
         // Init result data.
         $sendinformation = [];
 
-        // Get all instance SIRH data.
-        $sessionswithinstancesirh = $this->dbi->get_all_instance_sirh_with_user_id();
+        // Get SIRH data only for the sessions included in the current batch.
+        $sessionswithinstancesirh = $this->dbi->get_all_instance_sirh_with_user_id(array_keys($sessionscompletion));
         // Sirh data : key SIRH id => value courseid (session course).
         $instancesirhbycoursid = array_column($sessionswithinstancesirh, 'courseid', 'id');
 
@@ -209,8 +244,10 @@ class send_session_followup_information extends \core\task\scheduled_task {
                 if ($enrolsirhid !== false) {
                     // Check if user enrolled to enrol SIRH instance.
                     $enrolsirh = $sessionswithinstancesirh[$enrolsirhid];
-                    $usersidenroled = explode(',', trim($enrolsirh->usersid, '{}'));
-                    if (array_search($userid, $usersidenroled)) {
+                    if (!isset($usersidenroledbyinstance[$enrolsirhid])) {
+                        $usersidenroledbyinstance[$enrolsirhid] = array_flip(explode(',', trim($enrolsirh->usersid, '{}')));
+                    }
+                    if (isset($usersidenroledbyinstance[$enrolsirhid][$userid])) {
                         // Add SIRH data.
                         $userinfo->{'Suivi session utilisateur'}->identifiantSirhOrigine = $enrolsirh->customchar1;
                         $userinfo->{'Suivi session utilisateur'}->identifiantFormation = $enrolsirh->customchar2;

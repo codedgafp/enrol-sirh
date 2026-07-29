@@ -192,7 +192,7 @@ class database_interface {
      * @return \stdClass[];
      * @throws \dml_exception
      */
-    public function get_all_instance_sirh_with_user_id() {
+    public function get_all_instance_sirh_with_user_id($courseids = []) {
         global $CFG;
 
         if ($CFG->dbtype == 'mysqli') {
@@ -200,6 +200,14 @@ class database_interface {
             $aggregateusers = "GROUP_CONCAT(u.id SEPARATOR ',')";
         } else {
             $aggregateusers = 'array_agg(u.id)';
+        }
+
+        $params = ['sirh' => 'sirh'];
+        $wherecourse = '';
+        if (!empty($courseids)) {
+            list($insql, $inparams) = $this->db->get_in_or_equal($courseids, SQL_PARAMS_NAMED, 'courseid');
+            $wherecourse = ' AND c.id ' . $insql;
+            $params = array_merge($params, $inparams);
         }
 
         return $this->db->get_records_sql('
@@ -215,8 +223,9 @@ class database_interface {
             JOIN {user_enrolments} ue ON ue.enrolid = e.id
             JOIN {user} u ON u.id = ue.userid
             WHERE e.enrol = :sirh
+            ' . $wherecourse . '
             GROUP BY e.id, c.id, s.courseshortname, sessionid
-        ', ['sirh' => 'sirh']);
+        ', $params);
     }
 
     /**
@@ -227,6 +236,58 @@ class database_interface {
      * @throws \dml_exception
      */
     public function get_sessions_completed_by_user($statusfilter = [], $updateall = false) {
+        return $this->db->get_records_sql(
+            $this->get_sessions_completed_by_user_sql($statusfilter, $updateall)
+        );
+    }
+
+    /**
+     * Get course ids with completion data linked to sessions.
+     *
+     * @param array $statusfilter
+     * @param bool $updateall
+     * @return array
+     * @throws \dml_exception
+     */
+    public function get_sessions_completed_course_ids_by_user($statusfilter = [], $updateall = false) {
+        return $this->db->get_fieldset_sql(
+            $this->get_sessions_completed_by_user_sql($statusfilter, $updateall, 'DISTINCT cc.course') . '
+            ORDER BY cc.course'
+        );
+    }
+
+    /**
+     * Get course completions completed link to one session course.
+     *
+     * @param int $courseid
+     * @param array $statusfilter
+     * @param bool $updateall
+     * @return array
+     * @throws \dml_exception
+     */
+    public function get_sessions_completed_by_user_by_course($courseid, $statusfilter = [], $updateall = false) {
+        return $this->db->get_records_sql(
+            $this->get_sessions_completed_by_user_sql(
+                $statusfilter,
+                $updateall,
+                'cc.*',
+                ' AND cc.course = :courseid'
+            ),
+            ['courseid' => $courseid]
+        );
+    }
+
+    /**
+     * Get course completion SQL linked to session after its last sync information to sirh API.
+     *
+     * @param array $statusfilter
+     * @param bool $updateall
+     * @param string $select
+     * @param string $additionalwhere
+     * @return string
+     */
+    protected function get_sessions_completed_by_user_sql($statusfilter = [], $updateall = false, $select = 'cc.*',
+        $additionalwhere = '') {
         // Status condition.
         if (empty($statusfilter) && !$updateall) {
             $statusfilter = [
@@ -237,9 +298,9 @@ class database_interface {
 
         $wheretimesynchronization = '';
         $wheretimecompletion = '';
-        $wherestatus = '';        
+        $wherestatus = '';
 
-        if(!$updateall) {
+        if (!$updateall) {
             foreach ($statusfilter as $status) {
                 $wherestatus = '(';
                 $wherestatus .= 's.status = \'' . $status . '\' OR ';
@@ -249,19 +310,21 @@ class database_interface {
             $wheretimesynchronization = ' s.lastsyncsirh < cc.timecompleted OR s.lastsyncsirh IS NULL AND ';
             $wheretimecompletion = ' cc.timecompleted IS NOT NULL AND ';
         }
-        
 
-        return $this->db->get_records_sql('
-            SELECT cc.*
+        $where = $wherestatus . ' '
+            . $wheretimesynchronization . '
+                ' . $wheretimecompletion . '
+                u.deleted = 0';
+
+        return '
+            SELECT ' . $select . '
             FROM {course_completions} cc
             JOIN {course} c ON cc.course = c.id
             JOIN {session} s ON c.shortname = s.courseshortname
             JOIN {user} u ON u.id = cc.userid
-            WHERE ' . $wherestatus . ' ' 
-                . $wheretimesynchronization . '
-                ' . $wheretimecompletion . '
-                u.deleted = 0
-        ');
+            WHERE (' . $where . ')
+            ' . $additionalwhere . '
+        ';
     }
 
     /**
