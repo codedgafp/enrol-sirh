@@ -96,19 +96,31 @@ class send_session_followup_information extends \core\task\scheduled_task {
     }
 
     public function execute() {
+       $this->process_completion();
+    }
+
+    /**
+     * Process one completion and send its session information to API SIRH.
+     *
+     * @param \stdClass $completion
+     * @return void
+     * @throws \coding_exception
+     * @throws \dml_exception
+     * @throws \moodle_exception
+     * @throws \Exception
+     */
+    public function process_completion() {
         // Get all completion link to session after its last sync information to sirh API.
         $completions = $this->dbi->get_sessions_completed_by_user($this->statusfilter, $this->updateall);
-        // Get session completion information.
-        $sessionscompletion = $this->get_sessions_completion_information($completions);
-        // Create data for API.
-        $sessiondata = $this->create_data_for_api($sessionscompletion);
-
-        // Send to API.
-        $hasnoerror = $this->send_to_api($sessiondata);
-
-        if ($this->scheduledfailed && !$hasnoerror) {
-            // Set task to fail.
-            \core\task\manager::scheduled_task_failed($this);
+        $hasnoerror = true;
+        foreach ($completions as $completion) {
+            $sessionscompletion = $this->get_sessions_completion_information([$completion]);
+            $sessiondata = $this->create_data_for_api($sessionscompletion);
+            $hasnoerror = $this->send_to_api($sessiondata) && $hasnoerror;
+            if ($this->scheduledfailed && !$hasnoerror) {
+                // Set task to fail.
+                \core\task\manager::scheduled_task_failed($this);
+            }
         }
     }
 
@@ -134,7 +146,7 @@ class send_session_followup_information extends \core\task\scheduled_task {
                 'timecompleted' => $completion->timecompleted,
                 'timeenrolled'  => $completion->timeenrolled ?? $completion->timecompleted,
             ] ;
-            
+
         }
 
         return $sessionscompletedinformation;
@@ -180,7 +192,7 @@ class send_session_followup_information extends \core\task\scheduled_task {
             $sessionmentor->identifiantFormationMentor = $training->id;
             $sessionmentor->collectionFormation = $training->collection;
             $sessionmentor->dureeDistanceSession  = $session->onlinesessionestimatedtime;
-            $sessionmentor->dureePresenceSession  = $session->presencesessionestimatedtime;        
+            $sessionmentor->dureePresenceSession  = $session->presencesessionestimatedtime;
             $sessionmentor->libelleSession = $session->fullname;
             $sessionmentor->identifiantSirhOrigineFormation = $training->idsirh;
             $sessionmentor->dateDebut = date('Y-m-d', $session->sessionstartdate);
@@ -199,7 +211,7 @@ class send_session_followup_information extends \core\task\scheduled_task {
                 // Init user data.
                 $userinfo = new \stdClass();
                 $userinfo->{'Suivi session utilisateur'} = new \stdClass();
-                $userinfo->{'Suivi session utilisateur'}->dateAchevement = date('Y-m-d', $completioninfo->timecompleted);                
+                $userinfo->{'Suivi session utilisateur'}->dateAchevement = date('Y-m-d', $completioninfo->timecompleted);
                 $userinfo->{'Suivi session utilisateur'}->dateInscription = date('Y-m-d', $completioninfo->timeenrolled);
                 $userinfo->{'Suivi session utilisateur'}->identifiantSirhOrigine = null;
                 $userinfo->{'Suivi session utilisateur'}->identifiantFormation = null;

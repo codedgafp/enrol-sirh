@@ -23,8 +23,6 @@
 
 define('CLI_SCRIPT', true);
 
-global $DB;
-
 // Send sessions followup informations : Data recovery purpose.
 $task = new \enrol_sirh\task\send_session_followup_information([], false, true);
 $task->execute();
