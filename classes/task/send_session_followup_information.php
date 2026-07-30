@@ -112,6 +112,7 @@ class send_session_followup_information extends \core\task\scheduled_task {
     public function process_completion() {
         // Get all completion link to session after its last sync information to sirh API.
         $completions = $this->dbi->get_sessions_completed_by_user($this->statusfilter, $this->updateall);
+        mtrace('Send session followup information to SIRH API for ' . count($completions) . ' completions');
         $hasnoerror = true;
         foreach ($completions as $completion) {
             $sessionscompletion = $this->get_sessions_completion_information([$completion]);
@@ -121,6 +122,7 @@ class send_session_followup_information extends \core\task\scheduled_task {
                 // Set task to fail.
                 \core\task\manager::scheduled_task_failed($this);
             }
+            mtrace('Send session followup information to SIRH API for completion ' . $completion->id . ' : ' . ($hasnoerror ? 'OK' : 'KO'));
         }
     }
 

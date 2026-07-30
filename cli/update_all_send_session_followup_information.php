@@ -15,13 +15,14 @@
 // along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
 
 /**
- * Auth plugin "OIDC Sync" - CLI Script
+ * SIRH plugin "SIRH" - CLI Script
  *
- * @package    auth_oidc_sync
+ * @package    SIRH
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 
 define('CLI_SCRIPT', true);
+require(dirname(__DIR__, 3) . '/config.php');
 
 // Send sessions followup informations : Data recovery purpose.
 $task = new \enrol_sirh\task\send_session_followup_information([], false, true);
